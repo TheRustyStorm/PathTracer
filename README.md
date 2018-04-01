@@ -31,6 +31,7 @@ Execute it with
 ./PathTracer
 ```
 
+### Example config with mostly correct Light
 - RECURSION_DEPTH 3 
 - PIXEL_SAMPLES 1 
 - RAY_SAMPLES 20 
@@ -40,6 +41,7 @@ Execute it with
 - Needs around 12,63s seconds on my Macbook
 ![Correct Light](https://github.com/TheSovietStorm/PathTracer/blob/master/SLOW.png)
 
+### Example config with simplified Light
 - RECURSION_DEPTH 3 
 - PIXEL_SAMPLES 1 
 - RAY_SAMPLES 20
@@ -49,6 +51,7 @@ Execute it with
 - 55,44s on my Macbook
 ![Incorrect Light](https://github.com/TheSovietStorm/PathTracer/blob/master/FAST.png)
 
+### Example config for a wallpaper
 - RECURSION_DEPTH 9
 - PIXEL_SAMPLES 4
 - RAY_SAMPLES 1000
