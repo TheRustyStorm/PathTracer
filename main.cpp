@@ -5,7 +5,7 @@
 
 int main(){
     std::srand(std::time(nullptr));
-    Screen screen(1000,700);
+    Screen screen(IMAGE_WIDTH,IMAGE_HEIGHT);
     Camera camera = Camera();
     camera.setEyePoint(Point(0.0,1.0,3.0));
     camera.setLookAt(Point(0.0,0.0,0.0));
