@@ -18,6 +18,7 @@ The example picture is done with
 - #NUM_SAMPLES 20
 - recursion depth : 3
 - sample amount : 1
+
 and needed 45 seconds on a Macbook Pro
 ## Getting Started
 
