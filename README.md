@@ -34,6 +34,8 @@ Execute it with
 - RECURSION_DEPTH 3 
 - PIXEL_SAMPLES 1 
 - RAY_SAMPLES 20 
+- IMAGE_WIDTH 1000
+- IMAGE_HEIGHT 700
 - //IGNORE_EVERYTHING_BUT_EMISSION : This is not defined
 - Needs around 12,63s seconds on my Macbook
 ![Correct Light](https://github.com/TheSovietStorm/PathTracer/blob/master/SLOW.png)
@@ -42,9 +44,19 @@ Execute it with
 - PIXEL_SAMPLES 1 
 - RAY_SAMPLES 20
 - IGNORE_EVERYTHING_BUT_EMISSION : This is defined
+- IMAGE_WIDTH 1000
+- IMAGE_HEIGHT 700
 - 55,44s on my Macbook
 ![Incorrect Light](https://github.com/TheSovietStorm/PathTracer/blob/master/FAST.png)
 
+- RECURSION_DEPTH 9
+- PIXEL_SAMPLES 4
+- RAY_SAMPLES 1000
+- IGNORE_EVERYTHING_BUT_EMISSION
+- IMAGE_WIDTH 2560
+- IMAGE_HEIGHT 1600
+- 18m 35s on my Macbook
+![Retina Sized Wallpaper](https://github.com/TheSovietStorm/PathTracer/blob/master/Wallpaper.png)
 
 ## Thankings
 Thanks to [LodePNG](http://lodev.org/lodepng/) for their awesome work to simplify the creation of PNG files. 
