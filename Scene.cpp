@@ -137,26 +137,25 @@ Point Scene::traceRay(const Ray& ray, const double IoR, int recDepth) const {
      * If the dotproduct is bigger than that number, trace a ray to the sphere
      *
      */
-    for (auto& object: spheres) {
-        if(object->getMaterial().isEmitting()) {
-            Direction sphereDir = Direction(object->getCenter() - intersectionPoint).normalize();
-            double dot = intersection->getNormal().dot(sphereDir);
-            for (int i = 0; i < RAY_SAMPLES; ++i) {
-                double r = ((double) rand() / (RAND_MAX));
-                if (dot > r) {
-                    #ifdef IGNORE_EVERYTHING_BUT_EMISSION
-                        localColor = localColor + object->getMaterial().getEmission();
-                    #else
-                    Ray randRay = Ray(intersectionPoint, sphereDir);
-                    localColor = localColor + traceRay(randRay, IoR, recDepth - 1);
-                    #endif
+        for (auto &object: spheres) {
+            if (object->getMaterial().isEmitting()) {
+                Direction sphereDir = Direction(object->getCenter() - intersectionPoint).normalize();
+                double dot = intersection->getNormal().dot(sphereDir);
+                for (int i = 0; i < RAY_SAMPLES; ++i) {
+                    double r = ((double) rand() / (RAND_MAX));
+                    if (dot > r) {
+                        #ifdef IGNORE_EVERYTHING_BUT_EMISSION
+                            localColor = localColor + object->getMaterial().getEmission();
+                        #else
+                            Ray randRay = Ray(intersectionPoint, sphereDir);
+                            localColor = localColor + traceRay(randRay, IoR, recDepth - 1);
+                        #endif
+                    }
                 }
+
             }
-
         }
-    }
-    localColor = localColor / RAY_SAMPLES;
-
+        localColor = localColor / RAY_SAMPLES;
     /**
     for (int i = 0; i < NUM_SAMPLES; i++) {
         Direction randDir;
