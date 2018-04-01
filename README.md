@@ -15,10 +15,10 @@ The first Parameter is the recursion depth. You want to have it at at least 3 to
 The second Parameter is the amount of slightly different rays shot per pixel.
 
 The example picture is done with 
-#NUM_SAMPLES 20
-recursion depth : 3
-sample amount : 1
-
+- #NUM_SAMPLES 20
+- recursion depth : 3
+- sample amount : 1
+and needed 45 seconds on a Macbook Pro
 ## Getting Started
 
 Use gcc or clang, have CMake installed, clone the Repo and run
