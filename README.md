@@ -7,6 +7,8 @@ If you want to create your own Scene, check out the bottom of Scene.cpp.
 I commented out the code for random Directions on each Intersection and the code for PointLights. Feel free to comment them in if you
 feel like it.
 
+## Configuration
+
 If you want to check out how much your CPU can handle, here are the things you can do to make the picture better.
 Go to config.cpp and edit the parameters you want to change.
 
@@ -14,6 +16,8 @@ Go to config.cpp and edit the parameters you want to change.
 - PIXEL_SAMPLES 1 : How many samples per Pixel shall be made?
 - RAY_SAMPLES 20 : How many samples per Ray shall be collected?
 - IGNORE_EVERYTHING_BUT_EMISSION : If you define this, the program speeds up drastically, at the cost of spheres not casting correct lights. See the example pictures
+- IMAGE_WIDTH 1000 : Width of the Image in Pixel
+- IMAGE_HEIGHT 700 : Height of the Image in Pixel
 
 ## Getting Started
 
@@ -30,6 +34,8 @@ Execute it with
 ```
 ./PathTracer
 ```
+
+## Examples
 
 ### Example config with mostly correct Light
 - RECURSION_DEPTH 3 
