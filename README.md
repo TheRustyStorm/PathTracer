@@ -23,7 +23,7 @@ sample amount : 1
 
 Use gcc or clang, have CMake installed, clone the Repo and run
 ```
-cmake CmakeLists.txt
+cmake CMakeLists.txt
 ```
 to generate the Makefile and run 
 ```
