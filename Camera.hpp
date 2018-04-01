@@ -15,7 +15,7 @@ private:
     double FoV;
 public:
     Camera():eyePoint(Point(0,0,0)),viewDir(Direction(0,0,-1)),upDir(Direction(0,1,0)), FoV(60){}
-    Camera(const Point _eyePoint):eyePoint(_eyePoint),viewDir(Direction(0,0,-1)),upDir(Direction(0,1,0)), FoV(60){}
+    explicit Camera(const Point _eyePoint):eyePoint(_eyePoint),viewDir(Direction(0,0,-1)),upDir(Direction(0,1,0)), FoV(60){}
     Camera(const Point _eyePoint, const Direction _viewDir):eyePoint(_eyePoint),viewDir(_viewDir),upDir(Direction(0,1,0)), FoV(60){}
     Camera(const Point _eyePoint, const Direction _viewDir, const Direction _upDir):eyePoint(_eyePoint),viewDir(_viewDir),upDir(_upDir), FoV(60){}
     Camera(const Point _eyePoint, const Direction _viewDir, const Direction _upDir, const double _FoV):eyePoint(_eyePoint),viewDir(_viewDir),upDir(_upDir), FoV(_FoV){}

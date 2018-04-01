@@ -6,6 +6,7 @@
 #define PATHTRACER_DIRECTION_H
 #include <iostream>
 #include <memory>
+#include <experimental/optional>
 
 class Direction{
 private:
@@ -30,8 +31,8 @@ public:
     double length() const;
     Direction normalize() const;
     Direction cross(const Direction& other) const;
-    std::unique_ptr<Direction> reflection(const Direction& normal) const;
-    std::unique_ptr<Direction> refraction(const Direction& normal, double IORRatio) const;
+    Direction reflection(const Direction& normal) const;
+    std::experimental::optional<Direction> refraction(const Direction& normal, double IORRatio) const;
 
     Direction rotateX(double a);
     Direction rotateY(double a);

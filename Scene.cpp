@@ -10,7 +10,8 @@
 #include "Plane.hpp"
 #include "SphereLight.hpp"
 #include <algorithm>
-#define NUM_SAMPLES 20
+#include <experimental/optional>
+#include "config.hpp"
 
 void Scene::addSphere(Sphere *object){
     spheres.push_back(object);
@@ -54,9 +55,9 @@ std::unique_ptr<Intersection> Scene::intersect(const Ray& ray, bool shadowRay) c
             continue;
         }
         std::unique_ptr<Intersection> i = object->intersect(ray);
-            if( i == nullptr){
-                continue;
-            }
+        if( i == nullptr){
+            continue;
+        }
 
         if(result == nullptr || i->getT() < result->getT()){
                 result = std::move(i);
@@ -67,35 +68,46 @@ std::unique_ptr<Intersection> Scene::intersect(const Ray& ray, bool shadowRay) c
 
 
 Point Scene::traceRay(const Ray& ray, const double IoR, int recDepth) const {
+
+    //Recursion End
     if (recDepth == 0) {
         return Point();
     }
+
     std::unique_ptr<Intersection> intersection = intersect(ray, false);
+    //Nothing hit
     if (intersection == nullptr) {
         return backgroundColor;
     }
 
+    //If Ray hits an emitting object, return the emission color
     if (intersection->getMaterial().isEmitting()) {
         return intersection->getMaterial().getEmission();
     }
 
     Point intersectionPoint = ray.getPosOnRay(intersection->getT() - epsilon);
-
     Direction normal = intersection->getNormal();
+
+
     Point reflection;
+
+    //Get reflected if any
     if (intersection->getMaterial().reflects()) {
-        Ray reflRay = Ray(intersectionPoint + normal * epsilon, *ray.getDirection().reflection(normal));
+        Ray reflRay = Ray(intersectionPoint + normal * epsilon, ray.getDirection().reflection(normal));
         reflection = traceRay(reflRay, IoR, recDepth - 1);
     } else {
         reflection = Point();
     }
 
     Point refraction;
+
+    //Get refracted if any
     if (intersection->getMaterial().refracts()) {
 
-        std::unique_ptr<Direction> refractionDir = ray.getDirection().refraction(normal,
-                                                                                 intersection->getMaterial().getIndexOfRefraction());
-        if (refractionDir != nullptr) {
+        std::experimental::optional<Direction> refractionDir = ray.getDirection().refraction(normal,
+                                                                                             intersection->getMaterial().getIndexOfRefraction());
+        //Total Internal Reflection May occur
+        if (refractionDir) {
             if (IoR == 1.0) {
                 Point inSurfacePos = intersectionPoint + normal * (-epsilon);
                 Ray refractionRay = Ray(inSurfacePos, *refractionDir);
@@ -114,22 +126,36 @@ Point Scene::traceRay(const Ray& ray, const double IoR, int recDepth) const {
 
     Point localColor = Point();
 
-
+    //Fancy Algorithm
+    /**
+     * For each sphere
+     * If the PRIMARY COLOR of a sphere is emitting
+     * Calculate the dotproduct between the sphere and the surface normal
+     * The following is done as often as NUM_SAMPLES is big
+     *
+     * get a random number between 0 and 1
+     * If the dotproduct is bigger than that number, trace a ray to the sphere
+     *
+     */
     for (auto& object: spheres) {
         if(object->getMaterial().isEmitting()) {
             Direction sphereDir = Direction(object->getCenter() - intersectionPoint).normalize();
             double dot = intersection->getNormal().dot(sphereDir);
-            for (int i = 0; i < NUM_SAMPLES; ++i) {
+            for (int i = 0; i < RAY_SAMPLES; ++i) {
                 double r = ((double) rand() / (RAND_MAX));
                 if (dot > r) {
+                    #ifdef IGNORE_EVERYTHING_BUT_EMISSION
+                        localColor = localColor + object->getMaterial().getEmission();
+                    #else
                     Ray randRay = Ray(intersectionPoint, sphereDir);
                     localColor = localColor + traceRay(randRay, IoR, recDepth - 1);
+                    #endif
                 }
             }
 
         }
     }
-    localColor = localColor / NUM_SAMPLES;
+    localColor = localColor / RAY_SAMPLES;
 
     /**
     for (int i = 0; i < NUM_SAMPLES; i++) {
@@ -199,20 +225,19 @@ Scene genScene() {
     Scene s = Scene();
 
     // and God said, let there be light and there was light
-    PointLight *l = new PointLight(Point(2, 4, -2), Point(.5,.5,.5), Point(.5,.5,.5), Point(.5,.5,.5));
+    //PointLight *l = new PointLight(Point(2, 4, -2), Point(.5,.5,.5), Point(.5,.5,.5), Point(.5,.5,.5));
 
     // attach the light source to the scene
-    s.addLight(l);
+    //s.addLight(l);
 
-    Point ambient = Point(1, 0, 0);
-    Point diffuse = Point(1, 0, 0);
-    Point specular = Point(1, 0, 0);
-    Point center = Point(5, 1, 6.2);
-    SphereLight *sl = new SphereLight(ambient, diffuse, specular, center, 1.0);
+    //Point ambient = Point(1, 0, 0);
+    //Point diffuse = Point(1, 0, 0);
+    //Point specular = Point(1, 0, 0);
+    //Point center = Point(5, 1, 6.2);
+    //SphereLight *sl = new SphereLight(ambient, diffuse, specular, center, 1.0);
     //s.addSphereLight(sl);
 
 
-    Material black = Material(Point(0.1, 0.1, 0.1), Point(0.3, 0.3, 0.3), Point(1, 1, 1), Point(0, 0, 0), 8, 0.3);
 
     Point rotation1 = Point(std::rand() % 360, std::rand() % 360, std::rand() % 360);
     Point rotation2 = Point(std::rand() % 360, std::rand() % 360, std::rand() % 360);
@@ -220,49 +245,42 @@ Scene genScene() {
     Point rotation4 = Point(std::rand() % 360, std::rand() % 360, std::rand() % 360);
     Point rotation5 = Point(std::rand() % 360, std::rand() % 360, std::rand() % 360);
 
-    // create the bluish material for the right sphere
     // points are treated as color values in the range [0, 1]
-    Material m1 = Material(Point(0.3, 0.3, 0.3), Point(0.5, 0.5, 0.5), Point(1, 1, 1), Point(0, 0, 0), 8, 0.2, 1.52);
+    Material black = Material(Point(0.1, 0.1, 0.1), Point(0.3, 0.3, 0.3), Point(1, 1, 1), Point(0, 0, 0), 8, 0.3);
+    Material glass = Material(Point(0.3, 0.3, 0.3), Point(0.5, 0.5, 0.5), Point(1, 1, 1), Point(0, 0, 0), 8, 0.2, 1.52);
+    Material red = Material(Point(1, 0, 0), Point(1, 0, 0), Point(1, 1, 1), Point(1, 0, 0), 8, 1);
+    Material cyan = Material(Point(0, 1, 1), Point(0, 1, 1), Point(1, 1, 1), Point(0, 1, 1), 8, 1);
+    Material yellow = Material(Point(1, 1, 0), Point(1, 1, 0), Point(1, 1, 1), Point(1, 1, 0), 8, 1);
+    Material green = Material(Point(0, 1, 0), Point(0, 1, 0), Point(1, 1, 1), Point(0, 1, 0), 8, 1);
+    Material white = Material(Point(0.3, 0.3, 0.3), Point(0.5, 0.5, 0.5), Point(1, 1, 1), Point(0, 0, 0), 8, 1);
 
 
-    // create a sphere, apply the material above to it and attach it to the scene
+    // Glass Sphere
     Point center1 = Point(2, -1, -2.5);
-    Sphere *sphere1 = new Sphere(center1, 1, m1, m1, rotation1);
+    Sphere *sphere1 = new Sphere(center1, 1, glass, glass, rotation1);
     s.addSphere(sphere1);
 
-    // create the red material and apply it to the left sphere
-    Material m2 = Material(Point(1, 0, 0), Point(1, 0, 0), Point(1, 1, 1), Point(1, 0, 0), 8, 1);
-    Point center2 = Point(-5, -1, -6.2);
-    Sphere *sphere2 = new Sphere(center2, 1, m2, black, rotation2);
-    s.addSphere(sphere2);
+    // Red Light Emitting Sphere
+    Point center_r = Point(-5, -1, -6.2);
+    Sphere *sphere_r = new Sphere(center_r, 1, red, black, rotation2);
+    s.addSphere(sphere_r);
 
-    Material m2_c = Material(Point(0, 1, 1), Point(0, 1, 1), Point(1, 1, 1), Point(0, 1, 1), 8, 1);
-    Point center2_c = Point(7, -1, -8);
-    Sphere *sphere2_c = new Sphere(center2_c, 1, m2_c, black, rotation3);
-    s.addSphere(sphere2_c);
+    //Cyan Light Emitting Sphere
+    Point center_c = Point(7, -1, -8);
+    Sphere *sphere_c = new Sphere(center_c, 1, cyan, black, rotation3);
+    s.addSphere(sphere_c);
 
-    Material m2_y = Material(Point(1, 1, 0), Point(1, 1, 0), Point(1, 1, 1), Point(1, 1, 0), 8, 1);
-    Point center2_y = Point(-12.9, -1, -25.2);
-    Sphere *sphere2_y = new Sphere(center2_y, 1, m2_y, black, rotation4);
-    s.addSphere(sphere2_y);
+    //Yellow Light Emitting Sphere
+    Point center_y = Point(-12.9, -1, -25.2);
+    Sphere *sphere_y = new Sphere(center_y, 1, yellow, black, rotation4);
+    s.addSphere(sphere_y);
 
-    Material m2_g = Material(Point(0, 1, 0), Point(0, 1, 0), Point(1, 1, 1), Point(0, 1, 0), 8, 1);
-    Point center2_g = Point(2.9, -1, -15.2);
-    Sphere *sphere2_g = new Sphere(center2_g, 1, m2_g, black, rotation5);
-    s.addSphere(sphere2_g);
+    //Green Light Emitting Sphere
+    Point center_g = Point(2.9, -1, -15.2);
+    Sphere *sphere_g = new Sphere(center_g, 1, green, black, rotation5);
+    s.addSphere(sphere_g);
 
-    // create the yellowish material and apply it to the big sphere in the back
-    //Material m3 = Material(Point(0.3, 0.3, 0), Point(0.7, 0.7, 0), Point(1, 1, 0), 8, 0.3);
-    //Point center3 = Point(0.0, 4.0, -8.0);
-    //Sphere* sphere3 = new Sphere(center3, 3.9, m3);
-    //s.addSphere(sphere3);
-
-    // create the white ground plane
-    //Material m4 = Material(Point(0.3, 0.3, 0.3), Point(0.5, 0.5, 0.5), Point(1, 1, 1), 32, 0.5);
-    Material m4 = Material(Point(0.3, 0.3, 0.3), Point(0.5, 0.5, 0.5), Point(1, 1, 1), Point(0, 0, 0), 8, 1);
-    Material m5 = Material(Point(0.1, 0.1, 0.1), Point(0.3, 0.3, 0.3), Point(1, 1, 1), Point(0, 0, 0), 8, 0.3);
-
-    Plane *p = new Plane(Direction(0.0, 1.0, 0.0).normalize(), 2, m4, m5);
+    Plane *p = new Plane(Direction(0.0, 1.0, 0.0).normalize(), 2, white, black);
     p->rotate(345);
     s.addPlane(p);
     return s;

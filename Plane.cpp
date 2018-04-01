@@ -28,12 +28,8 @@ void Plane::buildLocalFrame() {
     }else{
         v = Direction(0,1,0);
     }
-
-
-
     frame1 = normal.cross(v).normalize();
     frame2 = normal.cross(frame1).normalize();
-
     center = Point() + normal*(-d);
 }
 
@@ -44,21 +40,28 @@ const Material& Plane::getMaterial() const{
 
 const std::unique_ptr<Intersection> Plane::intersect(const Ray& r) const{
     double denom = r.getDirection().dot(normal);
+
+    //Parallel Ray
     if (denom == 0)
         return nullptr;
 
-    //double t = -(new Direction(ray.getOrigin()).dot(normal) + d) / denom;
     double t = -((r.getOrigin() - Point()).dot(normal) + d)/ denom;
+
 
     if (t < 0)
         return nullptr;
+
     Point p = r.getPosOnRay(t);
     Direction dir = p - center;
     double x = dir.dot(frame1);
     double y = dir.dot(frame2);
-    int w = (int)(round(x)) % 2;
-    int h = (int)(round(y)) % 2;
+    int w = (int)(round(x)) % 2; // w is either 0 or 1
+    int h = (int)(round(y)) % 2; // h is either 0 or 1
 
+    // if w and h are equal
+    // 00|01
+    // 10|11
+    // Needed for checkerboard pattern
     if((w + h) % 2 == 0){
         return std::unique_ptr<Intersection>(new Intersection(materialPrimary, normal, t));
     }else{
@@ -68,12 +71,16 @@ const std::unique_ptr<Intersection> Plane::intersect(const Ray& r) const{
 }
 
 void Plane::rotate(double angle) {
+    // Degree to Rad
     double _angle = angle * M_PI / 180;
+
     double ca = cos(_angle);
     double sa = sin(_angle);
 
     double x1 = frame1.getX() * ca + frame1.getZ()*sa;
     double z1 = frame1.getZ() * ca - frame1.getX()*sa;
+
+    //We assume the plane is not using the Y Dimension
     frame1 = Direction(x1, 0, z1);
     frame2 = normal.cross(frame1);
 

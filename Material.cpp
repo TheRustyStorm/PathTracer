@@ -48,7 +48,7 @@ double Material::getReflectivity(double cosI) const {
         return R0 + (1 - R0) * pow(1 - sign * cosI, 5);
 }
 
-const Point &Material::getEmission() const {
+const Point& Material::getEmission() const {
     return emission;
 }
 
