@@ -37,3 +37,7 @@ Execute it with
 ```
 
 ![alt text](https://github.com/TheSovietStorm/PathTracer/blob/master/Test.png)
+
+## Thankings
+Thanks to [LodePNG](http://lodev.org/lodepng/) for their awesome work to simplify the creation of PNG files. 
+You guys rock
