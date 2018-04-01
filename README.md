@@ -8,18 +8,13 @@ I commented out the code for random Directions on each Intersection and the code
 feel like it.
 
 If you want to check out how much your CPU can handle, here are the things you can do to make the picture better.
-1) Increase #NUM_SAMPLES in scene.cpp
-2) Increase either of YART renderer = YART(3,1); in main.cpp
+Go to config.cpp and edit the parameters you want to change.
 
-The first Parameter is the recursion depth. You want to have it at at least 3 to have some nice reflections.
-The second Parameter is the amount of slightly different rays shot per pixel.
+- RECURSION_DEPTH 3 : How deep should the Raytracer recurse?
+- PIXEL_SAMPLES 1 : How many samples per Pixel shall be made?
+- RAY_SAMPLES 20 : How many samples per Ray shall be collected?
+- IGNORE_EVERYTHING_BUT_EMISSION : If you define this, the program speeds up drastically, at the cost of spheres not casting correct lights. See the example pictures
 
-The example picture is done with 
-- #NUM_SAMPLES 20
-- recursion depth : 3
-- sample amount : 1
-
-and needed 45 seconds on a Macbook Pro
 ## Getting Started
 
 Use gcc or clang, have CMake installed, clone the Repo and run
@@ -36,7 +31,20 @@ Execute it with
 ./PathTracer
 ```
 
-![alt text](https://github.com/TheSovietStorm/PathTracer/blob/master/Test.png)
+- RECURSION_DEPTH 3 
+- PIXEL_SAMPLES 1 
+- RAY_SAMPLES 20 
+- //IGNORE_EVERYTHING_BUT_EMISSION : This is not defined
+- Needs around 12,63s seconds on my Macbook
+![Correct Light](https://github.com/TheSovietStorm/PathTracer/blob/master/SLOW.png)
+
+- RECURSION_DEPTH 3 
+- PIXEL_SAMPLES 1 
+- RAY_SAMPLES 20
+- IGNORE_EVERYTHING_BUT_EMISSION : This is defined
+- 55,44s on my Macbook
+![Incorrect Light](https://github.com/TheSovietStorm/PathTracer/blob/master/FAST.png)
+
 
 ## Thankings
 Thanks to [LodePNG](http://lodev.org/lodepng/) for their awesome work to simplify the creation of PNG files. 
