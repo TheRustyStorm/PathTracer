@@ -4,7 +4,7 @@
 #include "config.hpp"
 
 int main(){
-    std::srand(std::time(nullptr));
+    std::srand(time(nullptr));
     Screen screen(IMAGE_WIDTH,IMAGE_HEIGHT);
     Camera camera = Camera();
     camera.setEyePoint(Point(0.0,1.0,3.0));
