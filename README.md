@@ -67,6 +67,16 @@ Execute it with
 - 18m 35s on my Macbook
 ![Retina Sized Wallpaper](https://github.com/TheSovietStorm/PathTracer/blob/master/Wallpaper.png)
 
+### Example config for Fancy Light effects
+- RECURSION_DEPTH 9
+- PIXEL_SAMPLES 1
+- RAY_SAMPLES 10
+- //IGNORE_EVERYTHING_BUT_EMISSION : This is not defined
+- IMAGE_WIDTH 2560
+- IMAGE_HEIGHT 1600
+- Around 20 Minutes on my Macbook
+![Fancy Light effects](https://github.com/TheSovietStorm/PathTracer/blob/master/Test.png)
+
 ## Thankings
 Thanks to [LodePNG](http://lodev.org/lodepng/) for their awesome work to simplify the creation of PNG files. 
 You guys rock
