@@ -39,6 +39,10 @@ const std::unique_ptr<Intersection> Sphere::intersect(const Ray& r) const{
 
     Direction normal = (r.getPosOnRay(t)-center).normalize();
 
+    if(oneMaterial){
+        return std::unique_ptr<Intersection>(new Intersection(primaryMaterial, normal, t));
+    }
+
     Direction dir = Direction(r.getPosOnRay(t)-center).rotateX(angles.getX()).rotateY(toRadians(angles.getY())).rotateZ(toRadians(angles.getZ()));
     double theta = atan2(dir.getY(),dir.getX());
     double phi = acos(dir.getZ()/sqrt(sqradius));

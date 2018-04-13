@@ -36,5 +36,8 @@ public:
 };
 
 Scene genScene();
+Scene genSimpleScene();
+Scene genOtherScene();
+Scene genBoxScene();
 
 #endif //PATHTRACER_SCENE_HPP

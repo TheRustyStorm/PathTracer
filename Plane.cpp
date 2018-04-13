@@ -55,6 +55,17 @@ const std::unique_ptr<Intersection> Plane::intersect(const Ray& r) const{
     Direction dir = p - center;
     double x = dir.dot(frame1);
     double y = dir.dot(frame2);
+
+    if(isLimited){
+        if( x > maxWidth || x < -maxWidth || y > maxHeight || y < -maxHeight){
+            return nullptr;
+        }
+    }
+
+    if(oneMaterial){
+        return std::unique_ptr<Intersection>(new Intersection(materialPrimary, normal, t));
+    }
+
     int w = (int)(round(x)) % 2; // w is either 0 or 1
     int h = (int)(round(y)) % 2; // h is either 0 or 1
 

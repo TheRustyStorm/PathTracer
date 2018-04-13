@@ -18,13 +18,23 @@ private:
     const Material primaryMaterial;
     const Material secondaryMaterial;
     Point angles;
+    bool oneMaterial;
 public:
     Sphere(Point& _center, double _radius, const Material& _primaryMaterial,
            const Material& _secondaryMaterial, Point& _angles) : center(_center), radius(_radius),
                                                                  sqradius(_radius * _radius),
                                                                  primaryMaterial(_primaryMaterial),
                                                                  secondaryMaterial(_secondaryMaterial),
-                                                                 angles(_angles) {}
+                                                                 angles(_angles) {
+        oneMaterial = false;
+    }
+    Sphere(Point& _center, double _radius, const Material& _primaryMaterial, Point& _angles) : center(_center), radius(_radius),
+                                                                 sqradius(_radius * _radius),
+                                                                 primaryMaterial(_primaryMaterial),
+                                                                 secondaryMaterial(_primaryMaterial),
+                                                                 angles(_angles) {
+        oneMaterial = true;
+    }
 
     virtual const Material &getMaterial() const override;
 
