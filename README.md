@@ -75,6 +75,7 @@ Execute it with
 - IMAGE_WIDTH 2560
 - IMAGE_HEIGHT 1600
 - Around 20 Minutes on my Macbook
+- Use the genBoxScene() in the main.cpp
 ![Fancy Light effects](https://github.com/TheSovietStorm/PathTracer/blob/master/Test.png)
 
 ## Thankings
