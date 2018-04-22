@@ -10,6 +10,8 @@
 #include "Ray.hpp"
 #include "IntersectableObject.hpp"
 
+enum TextureType{ONE_MATERIAL, STRIPES, CHECKERBOARD};
+
 class Sphere: public IntersectableObject {
 private:
     const Point center;
@@ -18,22 +20,21 @@ private:
     const Material primaryMaterial;
     const Material secondaryMaterial;
     Point angles;
-    bool oneMaterial;
+    TextureType textureType;
 public:
     Sphere(Point& _center, double _radius, const Material& _primaryMaterial,
-           const Material& _secondaryMaterial, Point& _angles) : center(_center), radius(_radius),
+           const Material& _secondaryMaterial, Point& _angles, TextureType _textureType) : center(_center), radius(_radius),
                                                                  sqradius(_radius * _radius),
                                                                  primaryMaterial(_primaryMaterial),
                                                                  secondaryMaterial(_secondaryMaterial),
-                                                                 angles(_angles) {
-        oneMaterial = false;
+                                                                 angles(_angles), textureType(_textureType){
     }
     Sphere(Point& _center, double _radius, const Material& _primaryMaterial, Point& _angles) : center(_center), radius(_radius),
                                                                  sqradius(_radius * _radius),
                                                                  primaryMaterial(_primaryMaterial),
                                                                  secondaryMaterial(_primaryMaterial),
                                                                  angles(_angles) {
-        oneMaterial = true;
+        textureType = ONE_MATERIAL;
     }
 
     virtual const Material &getMaterial() const override;

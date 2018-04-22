@@ -47,6 +47,7 @@ public:
     const std::unique_ptr<Intersection> intersect(const Ray &r) const override;
 
     void rotate(double angle);
+    const Point& getCenter() const;
 };
 
 #endif //PATHTRACER_PLANE_HPP

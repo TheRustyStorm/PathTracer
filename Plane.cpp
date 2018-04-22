@@ -96,3 +96,7 @@ void Plane::rotate(double angle) {
     frame2 = normal.cross(frame1);
 
 }
+
+const Point &Plane::getCenter() const {
+    return center;
+}

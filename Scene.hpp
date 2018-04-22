@@ -39,5 +39,7 @@ Scene genScene();
 Scene genSimpleScene();
 Scene genOtherScene();
 Scene genBoxScene();
+Scene genWeirdBoxScene();
+Scene genSmallptScene();
 
 #endif //PATHTRACER_SCENE_HPP

@@ -22,6 +22,7 @@ public:
     Point operator+(const Point&) const;
     Point operator*(const Point&) const;
     Point operator/(const Point&) const;
+    bool operator==(const Point&) const;
 
     Point operator+(double) const;
     Point operator-(double) const;

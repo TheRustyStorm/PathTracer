@@ -45,6 +45,10 @@ Point Point::operator/(double d) const {
     return Point(x / d, y / d, z / d);
 }
 
+bool Point::operator==(const Point& other) const{
+    return other.x == x && other.y == y && other.z == z;
+}
+
 double Point::getX() const{
     return x;
 }

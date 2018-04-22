@@ -2,6 +2,8 @@
 #include "Camera.hpp"
 #include "YART.hpp"
 #include "config.hpp"
+#include "MultiCoreYART.hpp"
+#include <thread>
 
 int main(){
     std::srand(time(nullptr));
@@ -12,13 +14,25 @@ int main(){
     camera.setLookAt(Point(0.0,0.0,0.0));
 
     YART renderer = YART(RECURSION_DEPTH,PIXEL_SAMPLES);
+
+    //MultiCoreYART *yart = new MultiCoreYART(RECURSION_DEPTH, PIXEL_SAMPLES);
+    //yart->setCamera(camera);
+
     renderer.setCamera(camera);
     //Scene s = genScene();
     //Scene s = genOtherScene();
     //Scene s = genSimpleScene();
-    Scene s = genBoxScene();
+//    Scene s = genBoxScene();
+//    Scene s = genWeirdBoxScene();
+    Scene s = genSmallptScene();
+
     renderer.setScene(s);
     renderer.render(screen);
+
+    //yart->setScene(s);
+    //std::thread th(&MultiCoreYART::render, &yart, screen, 0, screen.getHeight() );
+
+
     screen.save("Test.png");
 
 

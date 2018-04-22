@@ -6,6 +6,7 @@
 #define PATHTRACER_YART_HPP
 
 #include <cmath>
+#include <thread>
 #include "Camera.hpp"
 #include "Scene.hpp"
 #include "RaySetup.hpp"

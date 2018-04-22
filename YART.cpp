@@ -85,6 +85,7 @@ void YART::render(Screen& screen){
     }
 }
 
+
 Point YART::traceRay(const Ray& r){
     return scene.traceRay(r,1.0,recDepth);
 }

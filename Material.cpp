@@ -55,3 +55,7 @@ const Point& Material::getEmission() const {
 bool Material::isEmitting() const {
     return emits;
 }
+
+MaterialType Material::getMaterialType() const {
+    return type;
+}

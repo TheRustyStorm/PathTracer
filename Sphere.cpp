@@ -19,8 +19,8 @@ static double toDegree(double radians){
     return radians / M_PI * 180;
 }
 
-const std::unique_ptr<Intersection> Sphere::intersect(const Ray& r) const{
-    Direction l = center-r.getOrigin();
+const std::unique_ptr<Intersection> Sphere::intersect(const Ray& r) const {
+    Direction l = center - r.getOrigin();
 
     double tCenter = l.dot(r.getDirection());
     if (tCenter < 0)
@@ -37,29 +37,40 @@ const std::unique_ptr<Intersection> Sphere::intersect(const Ray& r) const{
         t = tCenter + dist; // when inside the sphere
     }
 
-    Direction normal = (r.getPosOnRay(t)-center).normalize();
+    Direction normal = (r.getPosOnRay(t) - center).normalize();
 
-    if(oneMaterial){
+    if (textureType == ONE_MATERIAL) {
         return std::unique_ptr<Intersection>(new Intersection(primaryMaterial, normal, t));
     }
 
-    Direction dir = Direction(r.getPosOnRay(t)-center).rotateX(angles.getX()).rotateY(toRadians(angles.getY())).rotateZ(toRadians(angles.getZ()));
-    double theta = atan2(dir.getY(),dir.getX());
-    double phi = acos(dir.getZ()/sqrt(sqradius));
+    Direction dir = Direction(r.getPosOnRay(t) - center).rotateX(angles.getX()).rotateY(
+            toRadians(angles.getY())).rotateZ(toRadians(angles.getZ()));
+    double theta = atan2(dir.getY(), dir.getX());
+    double phi = acos(dir.getZ() / sqrt(sqradius));
 
     phi = toDegree(phi);
+    theta = toDegree(theta+M_PI);
 
-    if((phi >= 30 && phi <= 60) || (phi >= 120 && phi <= 150) ){
-        return std::unique_ptr<Intersection>(new Intersection(secondaryMaterial,normal,t));
-    }
-    else{
-        return std::unique_ptr<Intersection>(new Intersection(primaryMaterial,normal,t));
-    }
 
+    if (textureType == STRIPES) {
+        if ((phi >= 30 && phi <= 60) || (phi >= 120 && phi <= 150)) {
+            return std::unique_ptr<Intersection>(new Intersection(secondaryMaterial, normal, t));
+        } else {
+            return std::unique_ptr<Intersection>(new Intersection(primaryMaterial, normal, t));
+        }
+    }
+    else {//if(textureType == CHECKERBOARD){
+        if(((int)(phi) % 60 <= 30 && (int)(theta) % 60 <= 30) || ((int)(phi) % 60 > 30 && (int)(theta) % 60 > 30) ){
+            return std::unique_ptr<Intersection>(new Intersection(secondaryMaterial, normal, t));
+        }
+        else{
+            return std::unique_ptr<Intersection>(new Intersection(primaryMaterial, normal, t));
+        }
+    }
     //atan2 calculates value from -PI to PI
     //add PI to the value to get a value between 0 and 2PI
     //divide by 2PI to get a value between 0 and 1
-   // double u = ((theta+M_PI)/(2*M_PI));
+    // double u = ((theta+M_PI)/(2*M_PI));
 
     //acos calculates value from 0 to PI
     //divide by PI to get value between 0 and 1
