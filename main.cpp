@@ -25,6 +25,7 @@ int main(){
 //    Scene s = genBoxScene();
 //    Scene s = genWeirdBoxScene();
     Scene s = genSmallptScene();
+   // Scene s = genStevenScene();
 
     renderer.setScene(s);
     renderer.render(screen);

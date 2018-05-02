@@ -44,5 +44,11 @@ public:
 
     friend std::ostream& operator<<(std::ostream&, const Direction&);
 
+    //https://www.gamedev.net/forums/topic/424118-fast-way-to-generate-random-point-on-hemisphere/
+    unsigned my_rand(void);
+    float U_m1_p1();
+    Direction pick_random_point_in_sphere();
+    Direction pick_random_point_in_semisphere();
+
 };
 #endif //PATHTRACER_DIRECTION_H

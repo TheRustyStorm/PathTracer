@@ -19,6 +19,8 @@ public:
     Direction operator-(const Point&) const;
     Point operator+(const Direction&) const;
     Point operator-(const Direction&) const;
+    void operator+=(const Direction&);
+    void operator+=(const Point&);
     Point operator+(const Point&) const;
     Point operator*(const Point&) const;
     Point operator/(const Point&) const;

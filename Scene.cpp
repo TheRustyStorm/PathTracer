@@ -130,23 +130,10 @@ Point Scene::traceRay(const Ray& ray, const double IoR, int recDepth) const {
     }
 
 
-    Point localColor = intersection->getMaterial().getDiffuse();
+    Point localColor;
 
-    if(intersection->getMaterial().getMaterialType() == DIFFUSE){
-        long ran = rand();
-        long x = (ran % 10) - 5;
-        long y = (ran >> 8) % 10 - 5;
-        long z = (ran >> 16) % 10 - 5;
-        Direction tempDir = Direction(x,y,z);
-        Direction rayDir = normal + tempDir;
-        if(rayDir.dot(normal) < 1){
-            rayDir = rayDir * (-1);
-        }
-        Ray randRay = Ray(intersectionPoint, rayDir);
-        localColor = localColor + traceRay(randRay, IoR, recDepth - 2);
-    }
-
-
+#ifdef IGNORE_EVERYTHING_BUT_EMISSION
+    localColor =Point();
     /**
      * For each sphere
      * If the PRIMARY COLOR of a sphere is emitting
@@ -157,7 +144,6 @@ Point Scene::traceRay(const Ray& ray, const double IoR, int recDepth) const {
      * If the dotproduct is bigger than that number, trace a ray to the sphere
      *
      */
-/*
         for (auto &object: spheres) {
             if (object->getMaterial().isEmitting()) {
                 Direction sphereDir = Direction(object->getCenter() - intersectionPoint).normalize();
@@ -166,26 +152,29 @@ Point Scene::traceRay(const Ray& ray, const double IoR, int recDepth) const {
                 for (int i = 0; i < RAY_SAMPLES; ++i) {
                     double r = ((double) rand() / (RAND_MAX));
                     if (dot > r) {
-#ifdef IGNORE_EVERYTHING_BUT_EMISSION
-//                        if(recDepth == 1 || (intersection->getMaterial().getAmbient() == Point(1,1,1))) {
-                            localColor = localColor + object->getMaterial().getEmission();
-
-  //                      }
-   //                     else {
-#else
-                            Ray randRay = Ray(intersectionPoint, sphereDir);
-                        localColor = localColor + intersection->getMaterial().getAmbient();
-                                localColor = localColor + traceRay(randRay, IoR, recDepth-1);
-#endif
+                            localColor +=  intersection->getMaterial().getDiffuse()*object->getMaterial().getEmission();
                     }
                 }
 
             }
-        }localColor = localColor / RAY_SAMPLES;
+        }
 
-        */
+#else
+    localColor = intersection->getMaterial().getDiffuse();
+
+    if(intersection->getMaterial().getMaterialType() == DIFFUSE){
+        for(int i = 0; i < RAY_SAMPLES; ++i) {
+            Direction rayDir = normal.pick_random_point_in_semisphere();
+            Ray randRay = Ray(intersectionPoint, rayDir);
+            localColor += traceRay(randRay, IoR, recDepth-1);
+        }
+    }
 
 
+#endif
+
+
+    localColor = localColor / RAY_SAMPLES;
     localColor.clamp(0.0, 1.0);
 
     double cosI = ray.getDirection().dot(intersection->getNormal());
@@ -563,6 +552,71 @@ Scene genSmallptScene(){
     s.addPlane(right);
 
     Plane *left = new Plane(Direction(1.0, 0.0, 0.0).normalize(), 7, blueWall, 10, 5);
+    //p->rotate(345);
+    s.addPlane(left);
+
+    Plane *back = new Plane(Direction(0.0, 0.0, 1.0).normalize(), 10, whitePlane, 5, 7);
+    //p->rotate(345);
+    s.addPlane(back);
+
+    return s;
+}
+
+Scene genStevenScene(){
+    Scene s = Scene();
+
+    Material black = Material(Point(0.1, 0.1, 0.1), Point(0.3, 0.3, 0.3), Point(1, 1, 1), Point(0, 0, 0), 8, 0.5);
+    Material glass = Material(Point(0.3, 0.3, 0.3), Point(0.5, 0.5, 0.5), Point(1, 1, 1), Point(0, 0, 0), 8, 0.2, 1.52);
+    Material mirror = Material(Point(0.3, 0.3, 0.3), Point(0.5, 0.5, 0.5), Point(1, 1, 1), Point(0, 0, 0), 8, 0.2);
+    Material white = Material(Point(1, 1, 1), Point(1, 1, 1), Point(1, 1, 1), Point(1, 1, 1), 8, 1);
+    Material magenta = Material(Point(1, 0, 1), Point(1, 0, 1), Point(1, 0, 1), Point(1, 0, 1), 8, 1);
+    Material green = Material(Point(0, 1, 0), Point(0, 1, 0), Point(1, 1, 1), Point(0, 1, 0), 8, 1);
+
+    Material redWall = Material(Point(0.2, 0,0), Point(0.5,0,0), Point(1,1,1), Point(),8, 1);
+    Material blueWall = Material(Point(0, 0,0.2), Point(0,0,0.5), Point(1,1,1), Point(),8, 1);
+
+
+    Material whitePlane = Material(Point(0.3, 0.3, 0.3), Point(0.5, 0.5, 0.5), Point(1, 1, 1), Point(0, 0, 0), 8, 1);
+    Material blackPlane = Material(Point(0, 0, 0), Point(0.2, 0.2, 0.2), Point(.4, .4, .4), Point(0, 0, 0), 8, 1);
+
+    Point rotation1 = Point(std::rand() % 360, std::rand() % 360, std::rand() % 360);
+    Point rotation2 = Point(std::rand() % 360, std::rand() % 360, std::rand() % 360);
+
+    Point center_light = Point(0, 3, -5.2);
+    Point center_light2 = Point(1, 3, -5.2);
+    Point center_glass = Point(3, -3, -3.2);
+    Point center_mirror = Point(-3, -3, -7.2);
+
+
+
+    Sphere *sphere_light = new Sphere(center_light, 1, white, rotation2);
+    s.addSphere(sphere_light);
+
+//    Sphere *sphere_light2 = new Sphere(center_light2, 1, white, rotation2);
+  //  s.addSphere(sphere_light2);
+
+
+
+    Sphere *sphere_glass = new Sphere(center_glass, 1.5, mirror, rotation1);
+    s.addSphere(sphere_glass);
+
+    Sphere *sphere_mirror = new Sphere(center_mirror, 1.5, mirror, rotation1);
+    s.addSphere(sphere_mirror);
+
+
+    Plane *bottom = new Plane(Direction(0.0, 1.0, 0.0).normalize(), 5, whitePlane, 10, 7);
+    //p->rotate(345);
+    s.addPlane(bottom);
+
+    Plane *top = new Plane(Direction(0.0, -1.0, 0.0).normalize(), 4, whitePlane, 10, 7);
+    //p->rotate(345);
+    s.addPlane(top);
+
+    Plane *right = new Plane(Direction(-1.0, 0.0, 0.0).normalize(), 7, whitePlane, 10, 5);
+    //p->rotate(345);
+    s.addPlane(right);
+
+    Plane *left = new Plane(Direction(1.0, 0.0, 0.0).normalize(), 7, whitePlane, 10, 5);
     //p->rotate(345);
     s.addPlane(left);
 

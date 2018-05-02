@@ -17,6 +17,18 @@ Point Point::operator-(const Direction& other) const {
     return Point(x - other.getX(), y - other.getY(), z - other.getZ());
 }
 
+void Point::operator+=(const Direction& other) {
+    x += other.getX();
+    y += other.getY();
+    z += other.getZ();
+}
+
+void Point::operator+=(const Point& other){
+    x += other.x;
+    y += other.y;
+    z += other.z;
+}
+
 Point Point::operator+(const Point& other) const {
     return Point(x + other.x, y + other.y, z + other.z);
 }
