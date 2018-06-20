@@ -28,7 +28,7 @@ public:
     void addLight(PointLight *light);
     void addSphereLight(SphereLight *light);
     const Point getBackgroundColor() const;
-    std::unique_ptr<Intersection> intersect(const Ray& ray, bool shadowRay) const;
+    std::unique_ptr<Intersection> intersect(const Ray& ray) const;
     Point traceRay(const Ray& ray, const double IoR, int recDepth) const;
 
 
@@ -41,6 +41,7 @@ Scene genOtherScene();
 Scene genBoxScene();
 Scene genWeirdBoxScene();
 Scene genSmallptScene();
+Scene genPlaneScene();
 Scene genStevenScene();
 
 #endif //PATHTRACER_SCENE_HPP

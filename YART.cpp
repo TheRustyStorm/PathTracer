@@ -4,6 +4,7 @@
 
 #include "RaySetup.hpp"
 #include "YART.hpp"
+#include "config.hpp"
 #include <time.h>
 #include <iomanip>
 

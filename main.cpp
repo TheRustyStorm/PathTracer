@@ -19,12 +19,13 @@ int main(){
     //yart->setCamera(camera);
 
     renderer.setCamera(camera);
-    //Scene s = genScene();
+  //  Scene s = genScene();
     //Scene s = genOtherScene();
     //Scene s = genSimpleScene();
 //    Scene s = genBoxScene();
 //    Scene s = genWeirdBoxScene();
-    Scene s = genSmallptScene();
+      Scene s = genSmallptScene();
+  //  Scene s = genPlaneScene();
    // Scene s = genStevenScene();
 
     renderer.setScene(s);

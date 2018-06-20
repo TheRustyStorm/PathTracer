@@ -1,6 +1,5 @@
 //
-// Created by Peter Zdankin on 26.03.18.
-//
+// Created by Peter Zdankin on 26.03.18.  
 
 #include <cmath>
 #include "IntersectableObject.hpp"
@@ -37,14 +36,11 @@ const Point Scene::getBackgroundColor() const{
     return backgroundColor;
 }
 
-std::unique_ptr<Intersection> Scene::intersect(const Ray& ray, bool shadowRay) const{
+std::unique_ptr<Intersection> Scene::intersect(const Ray& ray) const{
 
     std::unique_ptr<Intersection> result = nullptr;
 
     for(auto& object: spheres){
-        if(shadowRay && !object->getMaterial().isShadowCaster()){
-            continue;
-        }
         std::unique_ptr<Intersection> i = object->intersect(ray);
         if( i == nullptr){
             continue;
@@ -56,9 +52,6 @@ std::unique_ptr<Intersection> Scene::intersect(const Ray& ray, bool shadowRay) c
     }
 
     for(auto& object: planes){
-        if(shadowRay && !object->getMaterial().isShadowCaster()){
-            continue;
-        }
         std::unique_ptr<Intersection> i = object->intersect(ray);
         if( i == nullptr){
             continue;
@@ -80,11 +73,13 @@ Point Scene::traceRay(const Ray& ray, const double IoR, int recDepth) const {
         return Point();
     }
 
-    std::unique_ptr<Intersection> intersection = intersect(ray, false);
+    std::unique_ptr<Intersection> intersection = intersect(ray);
     //Nothing hit
     if (intersection == nullptr) {
         return backgroundColor;
     }
+
+
 
     //If Ray hits an emitting object, return the emission color
     if (intersection->getMaterial().isEmitting()) {
@@ -145,6 +140,7 @@ Point Scene::traceRay(const Ray& ray, const double IoR, int recDepth) const {
      *
      */
         for (auto &object: spheres) {
+            int count = 1;
             if (object->getMaterial().isEmitting()) {
                 Direction sphereDir = Direction(object->getCenter() - intersectionPoint).normalize();
                 double dot = intersection->getNormal().dot(sphereDir);
@@ -152,29 +148,47 @@ Point Scene::traceRay(const Ray& ray, const double IoR, int recDepth) const {
                 for (int i = 0; i < RAY_SAMPLES; ++i) {
                     double r = ((double) rand() / (RAND_MAX));
                     if (dot > r) {
+                            count +=1;
                             localColor +=  intersection->getMaterial().getDiffuse()*object->getMaterial().getEmission();
                     }
                 }
+                localColor = localColor/(RAY_SAMPLES/count);
 
             }
         }
 
 #else
-    localColor = intersection->getMaterial().getDiffuse();
+    localColor = Point();
 
-    if(intersection->getMaterial().getMaterialType() == DIFFUSE){
-        for(int i = 0; i < RAY_SAMPLES; ++i) {
-            Direction rayDir = normal.pick_random_point_in_semisphere();
-            Ray randRay = Ray(intersectionPoint, rayDir);
-            localColor += traceRay(randRay, IoR, recDepth-1);
+    if(intersection->getMaterial().getMaterialType() == DIFFUSE) {
+        for (int i = 0; i < RAY_SAMPLES; ++i) {
+                    double x = ((double) rand() / (RAND_MAX))-0.5;
+                    double y = ((double) rand() / (RAND_MAX))-0.5;
+                    double z = ((double) rand() / (RAND_MAX))-0.5;
+                    Direction randDir = Direction(x,y,z).normalize();
+                    double dot = randDir.dot(normal);
+                    if(dot < 0){
+                      randDir = randDir * -1.0;
+                      dot *= -1;
+                    }
+                    if (dot > 0.2) {
+                        Ray randRay = Ray(intersectionPoint, randDir);
+                        int minDepth; 
+                        if(recDepth == RECURSION_DEPTH){
+                          minDepth = recDepth - 1;
+                        }else{
+                          minDepth = recDepth < 2? recDepth - 1: 1;
+                        }
+                        localColor += intersection->getMaterial().getDiffuse() * traceRay(randRay, IoR, minDepth);
+                    }
         }
     }
+
 
 
 #endif
 
 
-    localColor = localColor / RAY_SAMPLES;
     localColor.clamp(0.0, 1.0);
 
     double cosI = ray.getDirection().dot(intersection->getNormal());
@@ -240,32 +254,32 @@ Scene genScene() {
 
     // Red Light Emitting Sphere
     Point center_r = Point(-5, -1, -6.2);
-    Sphere *sphere_r = new Sphere(center_r, 1, red, black, rotation2, CHECKERBOARD);
+    Sphere *sphere_r = new Sphere(center_r, 1, red, black, rotation2, STRIPES);
     s.addSphere(sphere_r);
 
     //Cyan Light Emitting Sphere
     Point center_c = Point(7, -1, -8);
     Sphere *sphere_c = new Sphere(center_c, 1, cyan, black, rotation3, STRIPES);
-    s.addSphere(sphere_c);
+    //s.addSphere(sphere_c);
 
     //Magenta Light Emitting Sphere
     Point center_m = Point(15, -1, -38);
     Sphere *sphere_m = new Sphere(center_m, 1, magenta, black, rotation3, STRIPES);
-    s.addSphere(sphere_m);
+    //s.addSphere(sphere_m);
 
     //Yellow Light Emitting Sphere
     Point center_y = Point(-12.9, -1, -25.2);
     Sphere *sphere_y = new Sphere(center_y, 1, yellow, black, rotation4, STRIPES);
-    s.addSphere(sphere_y);
+    //s.addSphere(sphere_y);
 
     //Green Light Emitting Sphere
     Point center_g = Point(2.9, -1, -15.2);
-    Sphere *sphere_g = new Sphere(center_g, 1, green, black, rotation5, CHECKERBOARD);
+    Sphere *sphere_g = new Sphere(center_g, 1, green, black, rotation5, STRIPES);
     s.addSphere(sphere_g);
 
     //Blue Light Emitting Sphere
     Point center_b = Point(-3, -1, 1.2);
-    Sphere *sphere_b = new Sphere(center_b, 1, blue, black, rotation5, CHECKERBOARD);
+    Sphere *sphere_b = new Sphere(center_b, 1, blue, black, rotation5, STRIPES);
     s.addSphere(sphere_b);
 
     Plane *p = new Plane(Direction(0.0, 1.0, 0.0).normalize(), 2, white, black, 0, 0);
@@ -623,6 +637,52 @@ Scene genStevenScene(){
     Plane *back = new Plane(Direction(0.0, 0.0, 1.0).normalize(), 10, whitePlane, 5, 7);
     //p->rotate(345);
     s.addPlane(back);
+
+    return s;
+}
+
+Scene genPlaneScene(){
+    Scene s = Scene();
+
+    Material black = Material(Point(0.1, 0.1, 0.1), Point(0.3, 0.3, 0.3), Point(1, 1, 1), Point(0, 0, 0), 8, 0.5);
+    Material glass = Material(Point(0.3, 0.3, 0.3), Point(0.5, 0.5, 0.5), Point(1, 1, 1), Point(0, 0, 0), 8, 0.2, 1.52);
+    Material mirror = Material(Point(0.3, 0.3, 0.3), Point(0.5, 0.5, 0.5), Point(1, 1, 1), Point(0, 0, 0), 8, 0.2);
+    Material white = Material(Point(1, 1, 1), Point(1, 1, 1), Point(1, 1, 1), Point(1, 1, 1), 8, 1);
+    Material magenta = Material(Point(1, 0, 1), Point(1, 0, 1), Point(1, 0, 1), Point(1, 0, 1), 8, 1);
+    Material redWall = Material(Point(0.2, 0,0), Point(0.5,0,0), Point(1,1,1), Point(),8, 1);
+    Material blueWall = Material(Point(0, 0,0.2), Point(0,0,0.5), Point(1,1,1), Point(),8, 1);
+    Material whitePlane = Material(Point(0.3, 0.3, 0.3), Point(0.5, 0.5, 0.5), Point(1, 1, 1), Point(0, 0, 0), 8, 1);
+    Material blackPlane = Material(Point(0, 0, 0), Point(0.2, 0.2, 0.2), Point(.4, .4, .4), Point(0, 0, 0), 8, 1);
+    Material green = Material(Point(0, 1, 0), Point(0, 1, 0), Point(1, 1, 1), Point(0, 1, 0), 8, 1);
+    Material red = Material(Point(1, 0, 0), Point(1, 0, 0), Point(1, 1, 1), Point(1, 0, 0), 8, 1);
+    Material blue = Material(Point(0, 0, 1), Point(0, 0, 1), Point(1, 1, 1), Point(0, 0, 1), 8, 1);
+
+    Point rotation1 = Point(std::rand() % 360, std::rand() % 360, std::rand() % 360);
+    Point rotation2 = Point(std::rand() % 360, std::rand() % 360, std::rand() % 360);
+
+    Point center_glass = Point(0, 1, -5.2);
+    Point center_blue = Point(3, -3, -5.2);
+    Point center_green = Point(-3, -3, -5.2);
+
+
+
+    Sphere *sphere_glass = new Sphere(center_glass, 1, glass, rotation2);
+    s.addSphere(sphere_glass);
+
+    Sphere *sphere_green = new Sphere(center_green, 1, green, rotation1);
+    s.addSphere(sphere_green);
+
+    Sphere *sphere_blue = new Sphere(center_blue, 1, blue, rotation1);
+    s.addSphere(sphere_blue);
+
+    Plane *back = new Plane(Direction(0.0, 0.0, 1.0).normalize(), 6, whitePlane, 7, 10);
+    //p->rotate(345);
+    s.addPlane(back);
+
+    //Plane *top = new Plane(Direction(0.0, -1.0, 0.0).normalize(), 4, whitePlane, 10, 7);
+    //p->rotate(345);
+    //s.addPlane(top);
+
 
     return s;
 }
