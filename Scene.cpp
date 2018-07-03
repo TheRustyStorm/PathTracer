@@ -159,7 +159,7 @@ Point Scene::traceRay(const Ray& ray, const double IoR, int recDepth) const {
 
 #else
     localColor = Point();
-
+/*
     if(intersection->getMaterial().getMaterialType() == DIFFUSE) {
         for (int i = 0; i < RAY_SAMPLES; ++i) {
                     double x = ((double) rand() / (RAND_MAX))-0.5;
@@ -173,18 +173,24 @@ Point Scene::traceRay(const Ray& ray, const double IoR, int recDepth) const {
                     }
                     if (dot > 0.2) {
                         Ray randRay = Ray(intersectionPoint, randDir);
-                        int minDepth; 
-                        if(recDepth == RECURSION_DEPTH){
-                          minDepth = recDepth - 1;
-                        }else{
-                          minDepth = recDepth < 2? recDepth - 1: 1;
-                        }
-                        localColor += intersection->getMaterial().getDiffuse() * traceRay(randRay, IoR, minDepth);
+                        localColor += intersection->getMaterial().getDiffuse() * traceRay(randRay, IoR, recDepth-1);
+                    }
+                    if(recDepth == RECURSION_DEPTH){
+                      break;
                     }
         }
     }
-
-
+    */
+    
+                    double x = ((double) rand() / (RAND_MAX))-0.5;
+                    double y = ((double) rand() / (RAND_MAX))-0.5;
+                    double z = ((double) rand() / (RAND_MAX))-0.5;
+                    Direction randDir = Direction(x,y,z).normalize();
+                    if(randDir.dot(normal) < 0){
+                      randDir = randDir * -1.0;
+                    }
+                    Ray randRay = Ray(intersectionPoint, randDir);
+                    localColor += intersection->getMaterial().getDiffuse() * traceRay(randRay, IoR, recDepth-1);
 
 #endif
 
@@ -490,7 +496,6 @@ Scene genWeirdBoxScene(){
     Sphere *sphere_mirror = new Sphere(center_mirror, 1.5, black, rotation1);
     s.addSphere(sphere_mirror);
 
-
     Plane *bottom = new Plane(Direction(0.0, 1.0, 0.0).normalize(), 5, blackPlane, 10, 7);
     //p->rotate(345);
     s.addPlane(bottom);
@@ -506,7 +511,6 @@ Scene genWeirdBoxScene(){
     Plane *left = new Plane(Direction(1.0, 0.0, 0.0).normalize(), 7, blackPlane, 10, 5);
     //p->rotate(345);
     s.addPlane(left);
-
     Plane *back = new Plane(Direction(0.0, 0.0, 1.0).normalize(), 10, blackPlane, 5, 7);
     //p->rotate(345);
     s.addPlane(back);
@@ -675,7 +679,53 @@ Scene genPlaneScene(){
     Sphere *sphere_blue = new Sphere(center_blue, 1, blue, rotation1);
     s.addSphere(sphere_blue);
 
-    Plane *back = new Plane(Direction(0.0, 0.0, 1.0).normalize(), 6, whitePlane, 7, 10);
+    Plane *back = new Plane(Direction(0.0, 0.0, 1.0).normalize(), 6, whitePlane, 8, 10);
+    //p->rotate(345);
+    s.addPlane(back);
+
+    //Plane *top = new Plane(Direction(0.0, -1.0, 0.0).normalize(), 4, whitePlane, 10, 7);
+    //p->rotate(345);
+    //s.addPlane(top);
+
+
+    return s;
+}
+
+Scene genSimpleDiffuseScene(){
+    Scene s = Scene();
+
+    Material black = Material(Point(0.1, 0.1, 0.1), Point(0.3, 0.3, 0.3), Point(1, 1, 1), Point(0, 0, 0), 8, 0.5);
+    Material glass = Material(Point(0.3, 0.3, 0.3), Point(0.5, 0.5, 0.5), Point(1, 1, 1), Point(0, 0, 0), 8, 0.2, 1.52);
+    Material mirror = Material(Point(0.3, 0.3, 0.3), Point(0.5, 0.5, 0.5), Point(1, 1, 1), Point(0, 0, 0), 8, 0.2);
+    Material white = Material(Point(1, 1, 1), Point(1, 1, 1), Point(1, 1, 1), Point(1, 1, 1), 8, 1);
+    Material magenta = Material(Point(1, 0, 1), Point(1, 0, 1), Point(1, 0, 1), Point(1, 0, 1), 8, 1);
+    Material redWall = Material(Point(0.2, 0,0), Point(0.5,0,0), Point(1,1,1), Point(),8, 1);
+    Material blueWall = Material(Point(0, 0,0.2), Point(0,0,0.5), Point(1,1,1), Point(),8, 1);
+    Material whitePlane = Material(Point(0.3, 0.3, 0.3), Point(0.5, 0.5, 0.5), Point(1, 1, 1), Point(0, 0, 0), 8, 1);
+    Material blackPlane = Material(Point(0, 0, 0), Point(0.2, 0.2, 0.2), Point(.4, .4, .4), Point(0, 0, 0), 8, 1);
+    Material green = Material(Point(0, 1, 0), Point(0, 1, 0), Point(1, 1, 1), Point(0, 1, 0), 8, 1);
+    Material red = Material(Point(1, 0, 0), Point(1, 0, 0), Point(1, 1, 1), Point(1, 0, 0), 8, 1);
+    Material blue = Material(Point(0, 0, 1), Point(0, 0, 1), Point(1, 1, 1), Point(0, 0, 0), 8, 1);
+
+    Point rotation1 = Point(std::rand() % 360, std::rand() % 360, std::rand() % 360);
+    Point rotation2 = Point(std::rand() % 360, std::rand() % 360, std::rand() % 360);
+
+    Point center_glass = Point(0, 1, -5.2);
+    Point center_blue = Point(3, -3, -5.2);
+    Point center_green = Point(-3, -3, -5.2);
+
+
+
+    Sphere *sphere_glass = new Sphere(center_green, 1, glass, rotation2);
+    s.addSphere(sphere_glass);
+
+    Sphere *sphere_green = new Sphere(center_glass, 1, white, rotation1);
+    s.addSphere(sphere_green);
+
+    Sphere *sphere_blue = new Sphere(center_blue, 1, blue, rotation1);
+    s.addSphere(sphere_blue);
+
+    Plane *back = new Plane(Direction(0.0, 1.0, 0.0), 5, whitePlane, 8, 10);
     //p->rotate(345);
     s.addPlane(back);
 

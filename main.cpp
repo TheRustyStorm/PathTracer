@@ -20,13 +20,14 @@ int main(){
 
     renderer.setCamera(camera);
   //  Scene s = genScene();
-    //Scene s = genOtherScene();
-    //Scene s = genSimpleScene();
+//    Scene s = genOtherScene();
+  //  Scene s = genSimpleScene();
 //    Scene s = genBoxScene();
 //    Scene s = genWeirdBoxScene();
       Scene s = genSmallptScene();
-  //  Scene s = genPlaneScene();
-   // Scene s = genStevenScene();
+//    Scene s = genPlaneScene();
+//    Scene s = genStevenScene();
+  //  Scene s = genSimpleDiffuseScene();
 
     renderer.setScene(s);
     renderer.render(screen);

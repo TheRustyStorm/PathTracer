@@ -45,42 +45,48 @@ void YART::render(Screen& screen){
             Point color;
             if(numSamples == 1){
                 Ray r = computeRay(x,y,*rs);
-                color = traceRay(r);
+                for(int i = 0; i < RAY_SAMPLES; ++i){
+                    color = color + traceRay(r);
+                }
+                //color = color / RAY_SAMPLES;
+                //color = traceRay(r);
             }else{
                 color = Point();
                 for(int sY = 0; sY < numSamplesY; ++sY){
-                    for(int sX = 0; sX < numSamplesX; ++sX){
-                        Ray r = computeRay(x + sX/((double)numSamplesX), y + sY/((double)numSamplesY),*rs);
-                        color = color + traceRay(r);
+                  for(int sX = 0; sX < numSamplesX; ++sX){
+                    Ray r = computeRay(x + sX/((double)numSamplesX), y + sY/((double)numSamplesY),*rs);
+                    for(int i = 0; i < RAY_SAMPLES; ++i){
+                      color = color + traceRay(r);
                     }
-                }
+                    color = color / RAY_SAMPLES;
+                  }}
                 color = color / numSamples;
             }
             screen.setPixel(x, y, color);
             if(x % 128 == 0) {
-                double _x = x;
-                double _y = y;
-                double progress = (_y) / double(screen.getHeight());
-                c2 = clock();
-                float diff((float) c2 - (float) c1);
-                float seconds = diff / CLOCKS_PER_SEC;
-                int eta = seconds * (1/progress) - seconds ;
-                int eta_s = eta % 60;
-                int eta_m = (eta / 60) % 60;
-                int eta_h = (eta / 3600);
+              double _x = x;
+              double _y = y;
+              double progress = (_y) / double(screen.getHeight());
+              c2 = clock();
+              float diff((float) c2 - (float) c1);
+              float seconds = diff / CLOCKS_PER_SEC;
+              int eta = seconds * (1/progress) - seconds ;
+              int eta_s = eta % 60;
+              int eta_m = (eta / 60) % 60;
+              int eta_h = (eta / 3600);
 
-                int eta_total = seconds * (1/progress);
-                int eta_total_s = eta_total % 60;
-                int eta_total_m = (eta_total/60) % 60;
-                int eta_total_h = (eta_total/3600);
+              int eta_total = seconds * (1/progress);
+              int eta_total_s = eta_total % 60;
+              int eta_total_m = (eta_total/60) % 60;
+              int eta_total_h = (eta_total/3600);
 
-                std::cout << "Y:" << y << " Progress " << int(progress * 100.0) << "% ETA "
-                          << std::setfill('0') << std::setw(2) << eta_h << ":" << std::setfill('0') << std::setw(2)
-                          << eta_m << ":" << std::setfill('0') << std::setw(2) << eta_s
-                          << " TOTAL " << std::setfill('0') << std::setw(2) << eta_total_h << ":"
-                          << std::setfill('0') << std::setw(2) << eta_total_m << ":"<< std::setfill('0') << std::setw(2)
-                            << eta_total_s << " \r";
-                std::cout.flush();
+              std::cout << "Y:" << y << " Progress " << int(progress * 100.0) << "% ETA "
+                << std::setfill('0') << std::setw(2) << eta_h << ":" << std::setfill('0') << std::setw(2)
+                << eta_m << ":" << std::setfill('0') << std::setw(2) << eta_s
+                << " TOTAL " << std::setfill('0') << std::setw(2) << eta_total_h << ":"
+                << std::setfill('0') << std::setw(2) << eta_total_m << ":"<< std::setfill('0') << std::setw(2)
+                << eta_total_s << " \r";
+              std::cout.flush();
             }
         }
     }
@@ -88,10 +94,10 @@ void YART::render(Screen& screen){
 
 
 Point YART::traceRay(const Ray& r){
-    return scene.traceRay(r,1.0,recDepth);
+  return scene.traceRay(r,1.0,recDepth);
 }
 
 Ray YART::computeRay(double x, double y, const RaySetup& rs){
-    Direction direction = ((rs.topLeft + rs.dX*x + rs.dY * y) - Point()).normalize();
-    return Ray(rs.rayOrigin, direction);
+  Direction direction = ((rs.topLeft + rs.dX*x + rs.dY * y) - Point()).normalize();
+  return Ray(rs.rayOrigin, direction);
 }
