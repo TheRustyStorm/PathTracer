@@ -39,7 +39,7 @@ public:
 
     virtual const Material &getMaterial() const override;
 
-    virtual const std::unique_ptr<Intersection> intersect(const Ray &r) const override;
+    virtual const std::shared_ptr<Intersection> intersect(const Ray &r) const override;
     const Point getCenter() const;
 
 };

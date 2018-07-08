@@ -5,7 +5,6 @@
 #ifndef PATHTRACER_MATERIAL_HPP
 #define PATHTRACER_MATERIAL_HPP
 
-#include <jmorecfg.h>
 #include "Point.hpp"
 
 enum MaterialType {
@@ -56,7 +55,7 @@ public:
     }
 
     Material(const Point &_ambient, const Point &_diffuse, const Point &_specular, const Point &_emission,
-             double _exponent, double _local, boolean _isShadowCaster) :
+             double _exponent, double _local, bool _isShadowCaster) :
             ambient(_ambient), diffuse(_diffuse), specular(_specular), emission(_emission), exponent(_exponent),
             local(_local), IOR(0), shadowCaster(_isShadowCaster) { emits = (_emission - Point()).length() > 0;
         if(local < 1 && IOR != 1){

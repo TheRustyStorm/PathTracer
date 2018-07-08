@@ -38,7 +38,7 @@ const Material& Plane::getMaterial() const{
 }
 
 
-const std::unique_ptr<Intersection> Plane::intersect(const Ray& r) const{
+const std::shared_ptr<Intersection> Plane::intersect(const Ray& r) const{
     double denom = r.getDirection().dot(normal);
 
     //Parallel Ray
@@ -63,7 +63,7 @@ const std::unique_ptr<Intersection> Plane::intersect(const Ray& r) const{
     }
 
     if(oneMaterial){
-        return std::unique_ptr<Intersection>(new Intersection(materialPrimary, normal, t));
+        return std::make_shared<Intersection>(materialPrimary, normal, t);
     }
 
     int w = (int)(round(x)) % 2; // w is either 0 or 1
@@ -74,9 +74,9 @@ const std::unique_ptr<Intersection> Plane::intersect(const Ray& r) const{
     // 10|11
     // Needed for checkerboard pattern
     if((w + h) % 2 == 0){
-        return std::unique_ptr<Intersection>(new Intersection(materialPrimary, normal, t));
+        return std::make_shared<Intersection>(materialPrimary, normal, t);
     }else{
-        return std::unique_ptr<Intersection>(new Intersection(materialSecondary, normal, t));
+        return std::make_shared<Intersection>(materialSecondary, normal, t);
     }
 
 }

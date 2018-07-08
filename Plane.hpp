@@ -44,7 +44,7 @@ public:
 
     const Material &getMaterial() const override;
 
-    const std::unique_ptr<Intersection> intersect(const Ray &r) const override;
+    const std::shared_ptr<Intersection> intersect(const Ray &r) const override;
 
     void rotate(double angle);
     const Point& getCenter() const;

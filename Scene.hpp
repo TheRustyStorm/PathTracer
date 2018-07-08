@@ -28,7 +28,7 @@ public:
     void addLight(PointLight *light);
     void addSphereLight(SphereLight *light);
     const Point getBackgroundColor() const;
-    std::unique_ptr<Intersection> intersect(const Ray& ray) const;
+    std::shared_ptr<Intersection> intersect(const Ray& ray) const;
     Point traceRay(const Ray& ray, const double IoR, int recDepth) const;
 
 

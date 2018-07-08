@@ -36,12 +36,12 @@ const Point Scene::getBackgroundColor() const{
     return backgroundColor;
 }
 
-std::unique_ptr<Intersection> Scene::intersect(const Ray& ray) const{
+std::shared_ptr<Intersection> Scene::intersect(const Ray& ray) const{
 
-    std::unique_ptr<Intersection> result = nullptr;
+    std::shared_ptr<Intersection> result = nullptr;
 
     for(auto& object: spheres){
-        std::unique_ptr<Intersection> i = object->intersect(ray);
+        std::shared_ptr<Intersection> i = object->intersect(ray);
         if( i == nullptr){
             continue;
         }
@@ -52,7 +52,7 @@ std::unique_ptr<Intersection> Scene::intersect(const Ray& ray) const{
     }
 
     for(auto& object: planes){
-        std::unique_ptr<Intersection> i = object->intersect(ray);
+        std::shared_ptr<Intersection> i = object->intersect(ray);
         if( i == nullptr){
             continue;
         }
@@ -73,7 +73,7 @@ Point Scene::traceRay(const Ray& ray, const double IoR, int recDepth) const {
         return Point();
     }
 
-    std::unique_ptr<Intersection> intersection = intersect(ray);
+    std::shared_ptr<Intersection> intersection = intersect(ray);
     //Nothing hit
     if (intersection == nullptr) {
         return backgroundColor;

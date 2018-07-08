@@ -12,7 +12,7 @@
 class IntersectableObject{
 public:
     virtual const Material& getMaterial() const = 0;
-    virtual const std::unique_ptr<Intersection> intersect(const Ray& r) const = 0;
+    virtual const std::shared_ptr<Intersection> intersect(const Ray& r) const = 0;
     virtual ~IntersectableObject() = default;
 };
 

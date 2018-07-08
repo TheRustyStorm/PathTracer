@@ -19,7 +19,7 @@ static double toDegree(double radians){
     return radians / M_PI * 180;
 }
 
-const std::unique_ptr<Intersection> Sphere::intersect(const Ray& r) const {
+const std::shared_ptr<Intersection> Sphere::intersect(const Ray& r) const {
     Direction l = center - r.getOrigin();
 
     double tCenter = l.dot(r.getDirection());
@@ -40,7 +40,7 @@ const std::unique_ptr<Intersection> Sphere::intersect(const Ray& r) const {
     Direction normal = (r.getPosOnRay(t) - center).normalize();
 
     if (textureType == ONE_MATERIAL) {
-        return std::unique_ptr<Intersection>(new Intersection(primaryMaterial, normal, t));
+        return std::make_shared<Intersection>(primaryMaterial, normal, t);
     }
 
     Direction dir = Direction(r.getPosOnRay(t) - center).rotateX(angles.getX()).rotateY(
@@ -54,17 +54,17 @@ const std::unique_ptr<Intersection> Sphere::intersect(const Ray& r) const {
 
     if (textureType == STRIPES) {
         if ((phi >= 30 && phi <= 60) || (phi >= 120 && phi <= 150)) {
-            return std::unique_ptr<Intersection>(new Intersection(secondaryMaterial, normal, t));
+            return std::make_shared<Intersection>(secondaryMaterial, normal, t);
         } else {
-            return std::unique_ptr<Intersection>(new Intersection(primaryMaterial, normal, t));
+            return std::make_shared<Intersection>(primaryMaterial, normal, t);
         }
     }
     else {//if(textureType == CHECKERBOARD){
         if(((int)(phi) % 60 <= 30 && (int)(theta) % 60 <= 30) || ((int)(phi) % 60 > 30 && (int)(theta) % 60 > 30) ){
-            return std::unique_ptr<Intersection>(new Intersection(secondaryMaterial, normal, t));
+            return std::make_shared<Intersection>(secondaryMaterial, normal, t);
         }
         else{
-            return std::unique_ptr<Intersection>(new Intersection(primaryMaterial, normal, t));
+            return std::make_shared<Intersection>(primaryMaterial, normal, t);
         }
     }
     //atan2 calculates value from -PI to PI
