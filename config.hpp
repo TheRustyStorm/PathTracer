@@ -1,0 +1,15 @@
+//
+// Created by Peter Zdankin on 01.04.18.
+//
+
+#ifndef PATHTRACER_CONFIG_HPP
+#define PATHTRACER_CONFIG_HPP
+
+#define RECURSION_DEPTH 9
+#define PIXEL_SAMPLES 1
+#define RAY_SAMPLES 30
+//#define IGNORE_EVERYTHING_BUT_EMISSION
+#define IMAGE_WIDTH 2560
+#define IMAGE_HEIGHT 1600
+
+#endif //PATHTRACER_CONFIG_HPP
